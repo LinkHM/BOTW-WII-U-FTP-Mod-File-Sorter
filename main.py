@@ -211,11 +211,6 @@ class Ui(QtWidgets.QMainWindow):
             else:
                 self.sortingProgress_Label.setText("<font color='green'>Status: Good to go</font>")
 
-                self.sorting_ProgressBar.setValue(smf.percentComplete)
-        else:
-            self.sorting_ProgressBar.setValue(smf.percentComplete)
-            self.sortingProgress_Label.setText(smf.textStatus + "." * self.sortingProgress_Label.displayState)
-
     def setTextIfDifferent(self, targetLabel, targetText):
         if targetLabel.text() != targetText:
             targetLabel.setText(targetText)
@@ -241,7 +236,9 @@ class Ui(QtWidgets.QMainWindow):
         try:
             smf.compareLists(smf.getModFileList(self.browseModFolder_LineEdit.text()),
                   smf.getGameFilesLists(self.browseBaseGameList_LineEdit.text(), self.browseUpdateList_LineEdit.text(), self.browseDLCList_LineEdit.text()),
-                  self.browseOutputFolder_LineEdit.text())
+                  self.browseOutputFolder_LineEdit.text(),
+                  self.sortingProgress_Label,
+                  self.sorting_ProgressBar)
         except:
             e = sys.exc_info()
             QtWidgets.QMessageBox.about(self, "Oh No! There Was An Error", "Error: " + str(e))
@@ -249,6 +246,7 @@ class Ui(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.about(self, "Sorting Completed", "Sorting completed. Please use caution when using FTPiiU.")
         finally:
             self.pathSettingsContainer.setEnabled(True)
+            self.sorting_ProgressBar.setValue(0)
 
     def saveIniFile(self):
         config = configparser.ConfigParser()

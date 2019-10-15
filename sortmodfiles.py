@@ -9,9 +9,6 @@ DEFAULT_BASEGAMELIST_PATH = PROGRAM_DIR + os.sep + "filelists" + os.sep + "baseg
 DEFAULT_UPDATELIST_PATH = PROGRAM_DIR + os.sep + "filelists" + os.sep + "updatelist.txt"
 DEFAULT_DLCFILELIST_PATH = PROGRAM_DIR + os.sep + "filelists" + os.sep + "DLCfilelist.txt"
 
-percentComplete = 0.0
-textStatus = ""
-
 def getModFileList(modpath):
 	modFileList = []
 	for root, dirs, files in os.walk(modpath):
@@ -31,9 +28,7 @@ def getGameFilesLists(bgl=DEFAULT_BASEGAMELIST_PATH, udl=DEFAULT_UPDATELIST_PATH
 
 	return(bgFileList, udFileList, dlcFileList)
 
-def compareLists(modFileList, gameLists, ftpiiu_dir):
-	global percentComplete
-	global textStatus
+def compareLists(modFileList, gameLists, ftpiiu_dir, statusLabel=None, statusBar=None):
 
 	updateData_dir = ftpiiu_dir + os.sep + "Update Data"
 	#updateDataContent_dir = updateData_dir + os.sep + "Content"
@@ -59,11 +54,15 @@ def compareLists(modFileList, gameLists, ftpiiu_dir):
 		inUpdateData = False
 		inDLCData = False
 
-		percentComplete = (float(modFileList.index(f)) / float(len(modFileList))) * 100
+		textStatus = "Comparing File " + str(modFileList.index(f)) + " of " + str(len(modFileList))
+		if statusBar != None:
+			statusBar.setValue((float(modFileList.index(f)) / float(len(modFileList))) * 100)
+			statusLabel.setText(textStatus)
 
 		if (modFileList.index(f) % 10) == 0:
-			textStatus = "Comparing File " + str(modFileList.index(f)) + " of " + str(len(modFileList))
-			print(textStatus)
+			
+			if statusBar == None:
+				print(textStatus)
 			
 
 		for bgf in gameLists[0]:
