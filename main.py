@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, uic, QtGui, QtCore
 import sys
-import Sortmodfiles as smf
+import sortmodfiles as smf
 import os
 import configparser
 
