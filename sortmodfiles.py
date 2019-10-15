@@ -32,7 +32,6 @@ def getGameFilesLists(bgl=DEFAULT_BASEGAMELIST_PATH, udl=DEFAULT_UPDATELIST_PATH
 	return(bgFileList, udFileList, dlcFileList)
 
 def compareLists(modFileList, gameLists, ftpiiu_dir):
-	raise Exception('I know Python!')
 	global percentComplete
 	global textStatus
 
