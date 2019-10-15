@@ -213,11 +213,8 @@ class Ui(QtWidgets.QMainWindow):
 
                 self.sorting_ProgressBar.setValue(smf.percentComplete)
         else:
-            if self.sortingProgress_Label.text() != smf.OPERATION_COMPLETE_MSG:
-                self.sorting_ProgressBar.setValue(smf.percentComplete)
-                self.sortingProgress_Label.setText(smf.textStatus + "." * self.sortingProgress_Label.displayState)
-            else:
-                self.sorting_ProgressBar.setValue(100)
+            self.sorting_ProgressBar.setValue(smf.percentComplete)
+            self.sortingProgress_Label.setText(smf.textStatus + "." * self.sortingProgress_Label.displayState)
 
     def setTextIfDifferent(self, targetLabel, targetText):
         if targetLabel.text() != targetText:
