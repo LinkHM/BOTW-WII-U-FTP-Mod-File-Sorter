@@ -2,3 +2,5 @@
 Sort LOZ: Breath of the Wild mods into folders corresponding to their FTPiiU install location
 
 PyQt5 is needed to use the GUI.
+
+Tested on Windows 10; theoretically cross-platform compatable.
