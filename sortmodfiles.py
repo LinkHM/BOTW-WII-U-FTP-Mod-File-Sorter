@@ -54,8 +54,9 @@ def compareLists(modFileList, gameLists, ftpiiu_dir, feedback=None):
 		inUpdateData = False
 		inDLCData = False
 
+		textStatus = "Comparing file " + str(modFileList.index(f)) + " of " + str(len(modFileList))
+		
 		if feedback != None:
-			textStatus = "Comparing file " + str(modFileList.index(f)) + " of " + str(len(modFileList))
 			percentStatus = (float(modFileList.index(f)) / float(len(modFileList))) * 100
 			feedback(textStatus, percentStatus)
 
