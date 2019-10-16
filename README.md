@@ -7,4 +7,4 @@ sortmodfiles.py can be used by itself in a command line.
 
 Usage: python sortmodfiles.py [content dir of mod]
 
-Tested on Windows 10; theoretically cross-platform compatible.
+Tested on Windows 10; theoretically cross-platform.
