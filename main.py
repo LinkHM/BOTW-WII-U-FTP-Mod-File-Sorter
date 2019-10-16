@@ -8,6 +8,32 @@ PROGRAM_DIR = os.path.dirname(os.path.realpath(__file__))
 DEFAULT_INI_PATH = PROGRAM_DIR + os.sep + "settings.ini"
 MENU_UI_PATH = PROGRAM_DIR + os.sep + 'menu.ui'
 
+class SortModFilesWorker(QtCore.QObject):
+
+    done = QtCore.pyqtSignal(str, str)
+    update = QtCore.pyqtSignal(str, int)
+
+    def __init__(self, bgl, udl, dlcl, inf, outf):
+        QtCore.QObject.__init__(self)
+        self.bgl = bgl
+        self.udl = udl
+        self.dlcl = dlcl
+        self.inf = inf
+        self.outf = outf
+
+    def startProcess(self):
+        try:
+            smf.compareLists(smf.getModFileList(self.inf), smf.getGameFilesLists(self.bgl, self.udl, self.dlcl), self.outf, self.initUpdate)
+        except:
+            e = sys.exc_info()
+            self.done.emit("Oh No! There Was An Error", "Error: " + str(e))
+        else:
+            self.done.emit("Sorting Completed", "Sorting completed. Please use caution when using FTPiiU.")
+        
+    def initUpdate(self, text, percent):
+        self.update.emit(text, percent)
+
+
 class Ui(QtWidgets.QMainWindow):
     def __init__(self):
         super(Ui, self).__init__()
@@ -28,7 +54,7 @@ class Ui(QtWidgets.QMainWindow):
 
         self.startSorting_Btn = self.findChild(QtWidgets.QPushButton, "startSorting_Btn")
         self.startSorting_Btn.setEnabled(False)
-        self.startSorting_Btn.clicked.connect(self.startSortingMod)
+        self.startSorting_Btn.clicked.connect(self.startSortBtnPressed)
         self.exitApp_Btn = self.findChild(QtWidgets.QPushButton, "exitApp_Btn")
         self.exitApp_Btn.clicked.connect(self.exitBtnPressed)
         self.savePaths_Btn = self.findChild(QtWidgets.QPushButton, "savePaths_Btn")
@@ -211,6 +237,10 @@ class Ui(QtWidgets.QMainWindow):
             else:
                 self.sortingProgress_Label.setText("<font color='green'>Status: Good to go</font>")
 
+    def updateSortingStatus(self, text, percent):
+        self.sortingProgress_Label.setText(text)
+        self.sorting_ProgressBar.setValue(percent)
+
     def setTextIfDifferent(self, targetLabel, targetText):
         if targetLabel.text() != targetText:
             targetLabel.setText(targetText)
@@ -230,23 +260,35 @@ class Ui(QtWidgets.QMainWindow):
             self.startSorting_Btn.setEnabled(True)
 
         self.updateSortingProgress_Label()
+        
 
-    def startSortingMod(self):
+    def showResultsMsg(self, title, body):
+        QtWidgets.QMessageBox.about(self, title, body)
+        self.pathSettingsContainer.setEnabled(True)
+        self.startSorting_Btn.setEnabled(True)
+        self.sorting_ProgressBar.setValue(0)
+
+    def startSortBtnPressed(self):
         self.pathSettingsContainer.setEnabled(False)
-        try:
-            smf.compareLists(smf.getModFileList(self.browseModFolder_LineEdit.text()),
-                  smf.getGameFilesLists(self.browseBaseGameList_LineEdit.text(), self.browseUpdateList_LineEdit.text(), self.browseDLCList_LineEdit.text()),
-                  self.browseOutputFolder_LineEdit.text(),
-                  self.sortingProgress_Label,
-                  self.sorting_ProgressBar)
-        except:
-            e = sys.exc_info()
-            QtWidgets.QMessageBox.about(self, "Oh No! There Was An Error", "Error: " + str(e))
-        else:
-            QtWidgets.QMessageBox.about(self, "Sorting Completed", "Sorting completed. Please use caution when using FTPiiU.")
-        finally:
-            self.pathSettingsContainer.setEnabled(True)
-            self.sorting_ProgressBar.setValue(0)
+        self.startSorting_Btn.setEnabled(False)
+
+        self.updateThread = QtCore.QThread()
+        self.updateWorker = SortModFilesWorker(self.browseBaseGameList_LineEdit.text(),
+              self.browseUpdateList_LineEdit.text(),
+              self.browseDLCList_LineEdit.text(),
+              self.browseModFolder_LineEdit.text(),
+              self.browseOutputFolder_LineEdit.text()
+              )
+
+        self.updateWorker.moveToThread(self.updateThread)
+
+        self.updateThread.started.connect(self.updateWorker.startProcess)
+        self.updateWorker.update.connect(self.updateSortingStatus)
+        self.updateWorker.done.connect(self.showResultsMsg)
+        #self.updateThread.finished.connect(self.showResultsMsg)
+
+        self.updateThread.start()
+        
 
     def saveIniFile(self):
         config = configparser.ConfigParser()

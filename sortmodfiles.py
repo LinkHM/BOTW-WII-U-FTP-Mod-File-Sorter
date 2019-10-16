@@ -28,7 +28,7 @@ def getGameFilesLists(bgl=DEFAULT_BASEGAMELIST_PATH, udl=DEFAULT_UPDATELIST_PATH
 
 	return(bgFileList, udFileList, dlcFileList)
 
-def compareLists(modFileList, gameLists, ftpiiu_dir, statusLabel=None, statusBar=None):
+def compareLists(modFileList, gameLists, ftpiiu_dir, feedback=None):
 
 	updateData_dir = ftpiiu_dir + os.sep + "Update Data"
 	#updateDataContent_dir = updateData_dir + os.sep + "Content"
@@ -54,16 +54,15 @@ def compareLists(modFileList, gameLists, ftpiiu_dir, statusLabel=None, statusBar
 		inUpdateData = False
 		inDLCData = False
 
-		textStatus = "Comparing File " + str(modFileList.index(f)) + " of " + str(len(modFileList))
-		if statusBar != None:
-			statusBar.setValue((float(modFileList.index(f)) / float(len(modFileList))) * 100)
-			statusLabel.setText(textStatus)
+		if feedback != None:
+			textStatus = "Comparing file " + str(modFileList.index(f)) + " of " + str(len(modFileList))
+			percentStatus = (float(modFileList.index(f)) / float(len(modFileList))) * 100
+			feedback(textStatus, percentStatus)
 
 		if (modFileList.index(f) % 10) == 0:
-			
-			if statusBar == None:
+			if feedback == None:
 				print(textStatus)
-			
+		
 
 		for bgf in gameLists[0]:
 			if pathsMatch(f, bgf):
@@ -113,7 +112,7 @@ def moveFile(folder, f):
 	elif "content" in f:
 		newFilePath = folder + os.sep + "content" + f.split("content")[1]
 
-	print(newFilePath)
+	#print(newFilePath)
 	mkdir_p(os.path.dirname(os.path.abspath(newFilePath)))
 	shutil.copy2(f, newFilePath)
 
