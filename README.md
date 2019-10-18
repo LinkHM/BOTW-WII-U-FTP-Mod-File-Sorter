@@ -1,9 +1,11 @@
 # BOTW WII U FTP Mod File Sorter
 Sort LOZ: Breath of the Wild mods into folders corresponding to their FTPiiU install location
 
-PyQt5 is needed to use the GUI.
+Check the 'Releases' tab for the executable.
 
-sortmodfiles.py can be used without the gui in a command line.
+PyQt5 is needed to use the GUI if running from source.
+
+sortmodfiles.py can also be used without the gui in a command line.
 
 Usage: python sortmodfiles.py [content dir of mod]
 
