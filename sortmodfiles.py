@@ -4,7 +4,12 @@ import string
 import errno
 import shutil
 
-PROGRAM_DIR = os.path.dirname(os.path.realpath(__file__))
+if getattr(sys, 'frozen', False) :
+    PROGRAM_DIR = os.path.dirname(sys.executable)
+else:
+    PROGRAM_DIR = os.path.dirname(os.path.realpath(__file__))
+
+
 DEFAULT_BASEGAMELIST_PATH = PROGRAM_DIR + os.sep + "filelists" + os.sep + "basegamelist.txt"
 DEFAULT_UPDATELIST_PATH = PROGRAM_DIR + os.sep + "filelists" + os.sep + "updatelist.txt"
 DEFAULT_DLCFILELIST_PATH = PROGRAM_DIR + os.sep + "filelists" + os.sep + "DLCfilelist.txt"

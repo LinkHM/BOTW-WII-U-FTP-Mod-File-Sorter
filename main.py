@@ -4,9 +4,18 @@ import sortmodfiles as smf
 import os
 import configparser
 
-PROGRAM_DIR = os.path.dirname(os.path.realpath(__file__))
+
+
+if getattr(sys, 'frozen', False) :
+    internal_path = sys._MEIPASS
+    PROGRAM_DIR = os.path.dirname(sys.executable)
+else:
+    PROGRAM_DIR = os.path.dirname(os.path.realpath(__file__))
+    internal_path = PROGRAM_DIR
+
+
 DEFAULT_INI_PATH = PROGRAM_DIR + os.sep + "settings.ini"
-MENU_UI_PATH = PROGRAM_DIR + os.sep + 'menu.ui'
+MENU_UI_PATH = os.path.join(internal_path, 'menu.ui')
 
 class SortModFilesWorker(QtCore.QObject):
 
@@ -97,6 +106,13 @@ class Ui(QtWidgets.QMainWindow):
         self.browseModFolder_Label.statusOK = False
         self.browseOutputFolder_Label.statusOK = False
 
+        #Create list of buttons to resize
+        self.BtnList = [self.browseBaseGameList_Btn,
+        self.browseUpdateList_Btn,
+        self.browseDLCList_Btn,
+        self.browseModFolder_Btn,
+        self.browseOutputFolder_Btn]
+
         # Set Default Paths for LineEdits
         if os.path.isfile(DEFAULT_INI_PATH):
             self.loadIniFile()
@@ -115,6 +131,15 @@ class Ui(QtWidgets.QMainWindow):
 
 
         self.show()
+
+    def resizeEvent(self, e):
+        largestBtnSize = 0
+        for btn in self.BtnList:
+            if btn.size().width() > largestBtnSize:
+                largestBtnSize = btn.size().width()
+
+        for btn in self.BtnList:
+            btn.setMinimumWidth(largestBtnSize)
 
     def exitBtnPressed(self):
         if self.pathSettingsContainer.isEnabled():
@@ -162,7 +187,7 @@ class Ui(QtWidgets.QMainWindow):
 
     def openFileNameDialog(self, pathLineEdit):
         options = QtWidgets.QFileDialog.Options()
-        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self,"QtWidgets.QFileDialog.getOpenFileName()", "","Text Files (*.txt);;All Files (*)", options=options)
+        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self,"Select Plain Text File", "","Text Files (*.txt);;All Files (*)", options=options)
         if fileName:
             pathLineEdit.setText(fileName)
 
@@ -326,4 +351,7 @@ class Ui(QtWidgets.QMainWindow):
 
 app = QtWidgets.QApplication(sys.argv)
 window = Ui()
+
+app.setWindowIcon(QtGui.QIcon(os.path.join(internal_path, 'icon.ico')))
+window.setWindowIcon(QtGui.QIcon(os.path.join(internal_path, 'icon.ico')))
 app.exec_()
